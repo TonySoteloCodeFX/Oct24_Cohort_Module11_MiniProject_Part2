@@ -1,11 +1,8 @@
-
+import AppRoutes from "./routes";
+import "bootstrap/dist/css/bootstrap.min.css"; 
 
 function App() {
-
-  return (
-    <>
-    </>
-  )
+  return <AppRoutes />;
 }
 
-export default App
+export default App;
