@@ -16,4 +16,3 @@ export const createOrder = async (order) => {
     const response = await axios.post(API_URL, order);
     return response.data;
 };
-

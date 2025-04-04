@@ -1,24 +1,42 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getUsers, deleteUser } from "../../api/userApi";
-import { Button, Table } from "react-bootstrap";
+import { Button, Table, Spinner, Alert } from "react-bootstrap";
 import "../../styles/users/UserList.css";
 
 function UserList() {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
-    const data = await getUsers();
-    setUsers(data);
+    try {
+      const data = await getUsers();
+      setUsers(data);
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to load users.");
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteUser(id);
-    fetchUsers();
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      try {
+        await deleteUser(id);
+        fetchUsers(); 
+        alert("User deleted successfully!");
+      } catch (err) {
+        setError("Failed to delete user.");
+      }
+    }
   };
+
+  if (loading) return <Spinner animation="border" className="m-3" />;
+  if (error) return <Alert variant="danger" className="m-3">{error}</Alert>;
 
   return (
     <div className="user-list">
