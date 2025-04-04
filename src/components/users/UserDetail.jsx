@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Card, Button, Spinner, Alert } from 'react-bootstrap';
+import '../../stylesheets/users/userDetail.css';
+
 
 const UserDetail = () => {
   const { id } = useParams(); // grab user ID from URL
