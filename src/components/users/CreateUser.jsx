@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createUser } from "../../api/userApi";
-import "../../styles/users/CreateUser.css";
+import { Form, Button, Alert } from "react-bootstrap";
 
 function CreateUser() {
   const [formData, setFormData] = useState({
@@ -9,45 +9,84 @@ function CreateUser() {
     email: "",
   });
 
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!formData.first_name || !formData.last_name || !formData.email) {
+      setError("Please fill out all fields.");
+      return;
+    }
+
     try {
       await createUser(formData);
-      alert("User created successfully!");
-    } catch (error) {
-      console.error("Error creating user", error);
+      setSuccess("User created successfully!");
+      setFormData({ 
+        first_name: "",
+        last_name: "",
+        email: "",
+      });
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || "Failed to create user.");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="create-user-form">
-      <input
-        type="text"
-        name="first_name"
-        placeholder="First Name"
-        value={formData.first_name}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        name="last_name"
-        placeholder="Last Name"
-        value={formData.last_name}
-        onChange={handleChange}
-      />
-      <input
-        type="email"
-        name="email"
-        placeholder="Email"
-        value={formData.email}
-        onChange={handleChange}
-      />
-      <button type="submit">Create User</button>
-    </form>
+    <div className="create-user p-3"> 
+      <h2>Create User</h2>
+      {error && <Alert variant="danger" onClose={() => setError("")} dismissible>{error}</Alert>}
+      {success && <Alert variant="success" onClose={() => setSuccess("")} dismissible>{success}</Alert>}
+
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="firstName" className="mb-3">
+          <Form.Label>First Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            required 
+          />
+        </Form.Group>
+
+        <Form.Group controlId="lastName" className="mb-3">
+          <Form.Label>Last Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            required 
+          />
+        </Form.Group>
+
+        <Form.Group controlId="email" className="mb-3">
+          <Form.Label>Email</Form.Label>
+          <Form.Control
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required 
+          />
+        </Form.Group>
+
+        <Button type="submit" variant="primary">
+          Create User
+        </Button>
+      </Form>
+    </div>
   );
 }
 
